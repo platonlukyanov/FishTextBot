@@ -3,6 +3,7 @@ import telebot
 from databasecontrol import Controller
 import os
 
+
 def load_result(numberOfSentences, typeS):
     try:
         params = {
@@ -18,9 +19,9 @@ def load_result(numberOfSentences, typeS):
         return "ой... Что-то пошло не так"
 
 
-token = os.environ.get("TOKEN")
+token = "1343155750:AAG9iO2SPGblLw7evWGjOQjq6cmTiTgaKPE"
 bot = telebot.TeleBot(token)
-filename = os.environ.get("DATABASENAME")
+filename = "botdb.db"
 db_control = Controller(filename)
 
 
@@ -77,7 +78,8 @@ def numberator(message):
             numS = message.text
             bot.send_message(message.from_user.id, load_result(numberOfSentences=int(numS), typeS="sentence"))
         else:
-            bot.send_message(message.from_user.id, "У меня не такая большая фантазия( Попробуй попросить у меня текст длиной меньше 25 предложений.")
+            bot.send_message(message.from_user.id,
+                             "У меня не такая большая фантазия( Попробуй попросить у меня текст длиной меньше 25 предложений.")
     else:
         bot.send_message(message.from_user.id, "Пишите цифрами! Если хотите начать напишите /start")
 
