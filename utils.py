@@ -59,4 +59,4 @@ def write_data(message, filename="botdb.db"):
 # Messages
 
 def send_wiki(bot, chat_id):
-    bot.send_message(chat.id, get_wiki_message(), parse_mode="markdown")
+    bot.send_message(chat_id, get_wiki_message(), parse_mode="markdown")
