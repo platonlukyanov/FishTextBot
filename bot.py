@@ -1,23 +1,7 @@
-import requests
 import telebot
 from databasecontrol import Controller
+from utils import write_data, load_result, get_wiki_message, send_wiki
 import os
-
-
-def load_result(numberOfSentences, typeS):
-    try:
-        params = {
-            "type": typeS,
-            "number": numberOfSentences
-        }
-        url = "https://fish-text.ru/get"
-        r = requests.get(url, params=params)
-
-        frase = r.json()["text"]
-        return frase
-    except:
-        return "ой... Что-то пошло не так"
-
 
 token = "1343155750:AAG9iO2SPGblLw7evWGjOQjq6cmTiTgaKPE"
 bot = telebot.TeleBot(token)
@@ -25,34 +9,12 @@ filename = "botdb.db"
 db_control = Controller(filename)
 
 
-def write_data(message):
-    try:
-        db_control.write_user(
-            message.from_user.id,
-            message.from_user.first_name,
-            message.from_user.last_name,
-            message.from_user.username,
-            message.from_user.language_code
-        )
-    except Exception as e:
-        print("write user error: ", end="")
-        print(e)
-
-    try:
-        db_control.write_message(message.message_id,
-                                 message.from_user.id,
-                                 message.date,
-                                 message.text)
-    except Exception as e:
-        print("write message error: ", end="")
-        print(e)
-
-
 @bot.message_handler(commands=['start'])
 def first_page(message):
     markup = telebot.types.InlineKeyboardMarkup()
-    markup.add(telebot.types.InlineKeyboardButton(text='Вдохновляющую фразу на день', callback_data="title"))
-    markup.add(telebot.types.InlineKeyboardButton(text='Случайный текст', callback_data="sentence"))
+    markup.add(telebot.types.InlineKeyboardButton(text='Вдохновляющую фразу на день 😄', callback_data="title"))
+    markup.add(telebot.types.InlineKeyboardButton(text='Случайный текст 🎲', callback_data="sentence"))
+    markup.add(telebot.types.InlineKeyboardButton(text='Статья из Википедии 📖', callback_data="wiki"))
     print("first page request. USER: ", message.from_user.id)
 
     write_data(message)
@@ -65,8 +27,25 @@ def query_handler(call):
 
     if typeS == "title":
         bot.send_message(call.message.chat.id, load_result(numberOfSentences=1, typeS="title"))
-    else:
+    elif typeS == "sentence":
         bot.send_message(call.message.chat.id, "Сколько предложений?")
+    elif typeS == "wiki":
+        send_wiki(bot, call.message.chat.id)
+
+
+@bot.message_handler(commands=["wiki"])
+def wiki_handler(message):
+    send_wiki(bot, message.from_user.id)
+
+
+@bot.message_handler(commands=["text"])
+def send_random_text_question(message):
+    bot.send_message(message.from_user.id, "Сколько предложений?")
+
+
+@bot.message_handler(commands=["phrase"])
+def send_random_text_question(message):
+    bot.send_message(message.from_user.id, load_result(numberOfSentences=1, typeS="title"))
 
 
 @bot.message_handler(content_types=['text'])
